@@ -230,7 +230,7 @@ public final class RowDataDebeziumDeserializeSchema implements DebeziumDeseriali
 
 	private long convertToLong(Object dbzObj, Schema schema) {
 		if (dbzObj instanceof Integer) {
-			return (long) dbzObj;
+			return ((Integer) dbzObj).longValue();
 		} else if (dbzObj instanceof Long) {
 			return (long) dbzObj;
 		} else {
