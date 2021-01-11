@@ -40,6 +40,7 @@ under the License.
         <module>flink-sql-connector-mysql-cdc</module>
         <module>flink-sql-connector-postgres-cdc</module>
         <module>flink-format-changelog-json</module>
+        <module>flink-connector-sqlserver-cdc</module>
     </modules>
 
     <licenses>
@@ -63,7 +64,7 @@ under the License.
 
     <properties>
         <flink.version>1.11.1</flink.version>
-        <debezium.version>1.2.1.Final</debezium.version>
+        <debezium.version>1.4.0.Final</debezium.version>
         <testcontainers.version>1.14.3</testcontainers.version>
         <java.version>1.8</java.version>
         <scala.binary.version>2.11</scala.binary.version>
