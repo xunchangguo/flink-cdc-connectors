@@ -25,8 +25,8 @@ under the License.
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>flink-connector-mysql-cdc</artifactId>
-    <name>flink-connector-mysql-cdc</name>
+    <artifactId>flink-connector-oracle-cdc</artifactId>
+    <name>flink-connector-oracle-cdc</name>
     <packaging>jar</packaging>
 
     <dependencies>
@@ -46,7 +46,7 @@ under the License.
 
         <dependency>
             <groupId>io.debezium</groupId>
-            <artifactId>debezium-connector-mysql</artifactId>
+            <artifactId>debezium-connector-oracle</artifactId>
             <version>${debezium.version}</version>
         </dependency>
 
@@ -124,14 +124,6 @@ under the License.
         </dependency>
 
         <!-- test dependencies on TestContainers -->
-
-        <dependency>
-            <groupId>org.testcontainers</groupId>
-            <artifactId>mysql</artifactId>
-            <version>${testcontainers.version}</version>
-            <scope>test</scope>
-        </dependency>
-
         <dependency>
             <groupId>com.jayway.jsonpath</groupId>
             <artifactId>json-path</artifactId>

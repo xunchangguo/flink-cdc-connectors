@@ -16,11 +16,11 @@
  * limitations under the License.
  */
 
-package com.alibaba.ververica.cdc.connectors.sqlserver;
+package com.alibaba.ververica.cdc.connectors.oracle;
 
 import com.alibaba.ververica.cdc.debezium.DebeziumDeserializationSchema;
 import com.alibaba.ververica.cdc.debezium.DebeziumSourceFunction;
-import io.debezium.connector.sqlserver.SqlServerConnector;
+import io.debezium.connector.oracle.OracleConnector;
 
 import java.util.Properties;
 
@@ -29,22 +29,28 @@ import static org.apache.flink.util.Preconditions.checkNotNull;
 /**
  * A builder to build a SourceFunction which can read snapshot and continue to consume binlog.
  */
-public class SqlServerSource {
+public class OracleSource {
 
 	public static <T> Builder<T> builder() {
 		return new Builder<>();
 	}
 
 	/**
-	 * Builder class of {@link SqlServerSource}.
+	 * Builder class of {@link OracleSource}.
 	 */
 	public static class Builder<T> {
 
-		private int port = 1433; // default 1433 port
+		private int port = 1521; // default 1521 port
 		private String hostname;
 		private String database;
 		private String username;
 		private String password;
+		/** Name of the PDB to connect to, when working with the CDB + PDB model. */
+		private String pdbName;
+		/** Name of the XStream outbound server configured in the database. */
+		private String outServerName;
+		/** xstream/logminer. The adapter implementation to use. xstream uses the Oracle XStreams API. logminer uses the native Oracle LogMiner API. */
+		private String connectionAdapter;
 		private String serverTimeZone;
 		private String[] tableList;
 		private Properties dbzProperties;
@@ -56,7 +62,7 @@ public class SqlServerSource {
 		}
 
 		/**
-		 * Integer port number of the SqlServer database server.
+		 * Integer port number of the Oracle database server.
 		 */
 		public Builder<T> port(int port) {
 			this.port = port;
@@ -80,7 +86,7 @@ public class SqlServerSource {
 		}
 
 		/**
-		 * Name of the SqlServer database to use when connecting to the SqlServer database server.
+		 * Name of the Oracle database to use when connecting to the Oracle database server.
 		 */
 		public Builder<T> username(String username) {
 			this.username = username;
@@ -88,16 +94,31 @@ public class SqlServerSource {
 		}
 
 		/**
-		 * Password to use when connecting to the SqlServer database server.
+		 * Password to use when connecting to the Oracle database server.
 		 */
 		public Builder<T> password(String password) {
 			this.password = password;
 			return this;
 		}
 
+		public Builder<T> pdbName(String pdbName) {
+			this.pdbName = pdbName;
+			return this;
+		}
+
+		public Builder<T> outServerName(String outServerName) {
+			this.outServerName = outServerName;
+			return this;
+		}
+
+		public Builder<T> connectionAdapter(String connectionAdapter) {
+			this.connectionAdapter = connectionAdapter;
+			return this;
+		}
+
 		/**
 		 * The session time zone in database server, e.g. "America/Los_Angeles".
-		 * It controls how the TIMESTAMP type in SqlServer converted to STRING.
+		 * It controls how the TIMESTAMP type in Oracle converted to STRING.
 		 */
 		public Builder<T> serverTimeZone(String timeZone) {
 			this.serverTimeZone = timeZone;
@@ -105,7 +126,7 @@ public class SqlServerSource {
 		}
 
 		/**
-		 * The Debezium SqlServer connector properties. For example, "snapshot.mode".
+		 * The Debezium Oracle connector properties. For example, "snapshot.mode".
 		 */
 		public Builder<T> debeziumProperties(Properties properties) {
 			this.dbzProperties = properties;
@@ -122,21 +143,25 @@ public class SqlServerSource {
 
 		public DebeziumSourceFunction<T> build() {
 			Properties props = new Properties();
-			props.setProperty("connector.class", SqlServerConnector.class.getCanonicalName());
-			/**
-			 * Logical name that identifies and provides a namespace for the particular SQL Server database server being monitored.
-			 * The logical name should be unique across all other connectors, since it is used as a prefix for all Kafka topic
-			 * names emanating from this connector. Only alphanumeric characters and underscores should be used.
-			 */
-			props.setProperty("database.server.name", "sqlserver_cdc_source");
+			props.setProperty("connector.class", OracleConnector.class.getCanonicalName());
+			props.setProperty("database.server.name", "oracle_binlog_source");
 			props.setProperty("database.hostname", checkNotNull(hostname));
 			props.setProperty("database.user", checkNotNull(username));
 			props.setProperty("database.password", checkNotNull(password));
 			props.setProperty("database.port", String.valueOf(port));
-			props.setProperty("database.dbname", checkNotNull(database));
+			props.setProperty("database.dbname", String.valueOf(database));
+			props.setProperty("database.out.server.name", String.valueOf(outServerName));
+
+			if (pdbName != null) {
+				props.setProperty("database.pdb.name", pdbName);
+			}
 
 			if (tableList != null) {
 				props.setProperty("table.include.list", String.join(",", tableList));
+			}
+
+			if (connectionAdapter != null) {
+				props.setProperty("database.connection.adapter", connectionAdapter);
 			}
 			if (serverTimeZone != null) {
 				props.setProperty("database.server.timezone", serverTimeZone);

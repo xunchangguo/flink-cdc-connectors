@@ -25,12 +25,12 @@ under the License.
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>flink-sql-connector-postgres-cdc</artifactId>
+    <artifactId>flink-sql-connector-sqlserver-cdc</artifactId>
 
     <dependencies>
         <dependency>
             <groupId>com.alibaba.ververica</groupId>
-            <artifactId>flink-connector-postgres-cdc</artifactId>
+            <artifactId>flink-connector-sqlserver-cdc</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>
